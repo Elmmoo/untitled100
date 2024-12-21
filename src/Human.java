@@ -7,26 +7,57 @@ public class Human implements Buyer {
     private double money; // денежный счет человека
     private Set<Product> products; // купленные продукты
 
-    public void buyProduct(Product product, Shop shop) {
-        // Метод принимает на вход 2 параметра - название покупаемого продукта
-        // и магазин, в котором производится покупка
-
-        // Должен использоваться метод sellProduct класса Shop
-
-        // Должны быть обработы исключения,
-        // которые могут возникнуть при вызове метода sellProduct
-
-        // В случае успешной покупки - продукт добавляется в Set products
-        // и с денежнего счета человека вычитается стоимость продукта
-
-        // В случае неудачной покупки / исключения - в консоль должна выводиться
-        // причина, по которой покупка не произошла - сообщение исключения
+    public void setFname(String Fname){
+        firstName = Fname;
+    }
+    public String getFname(){
+        return firstName;
     }
 
-    // getters
-    // setters
+    public void setLname(String Lname){
+        lastName = Lname;
+    }
+    public String getLname(){
+        return lastName;
+    }
 
+    public void setMoney(double Money){
+        money = Money;
+    }
+    public double getMoney(){
+        return money;
+    }
+
+    public void setProductsHuman(Set<Product> ProductsHuman){
+        products = ProductsHuman;
+    }
+    public Set<Product> getProductsHuman(){
+        return products;
+    }
+
+    public Human(String firstName, String lastName, double money, Set<Product> products){
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.money = money;
+        this.products = products;
+    }
+
+    public void buyProduct(Product product, Shop shop) {
+        try {
+            shop.sellProduct(product, this);
+            products.add(product);
+            money -= product.getPrice();
+        } catch (SellProductException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }
+
+
+
+
+
+
 
 
 

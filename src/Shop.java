@@ -1,43 +1,107 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static javax.swing.UIManager.get;
+import static javax.swing.UIManager.put;
+
 public class Shop {
 
     private String name;
-    private double money; // денежный счет магазина
-    private Map<Product,Integer> products; // продукты и их количество
-    //  количество может быть 0 !
+    private double money;
+    private Map<Product, Integer> products;
+
+
+    void checkAndAddProduct(Product product) {
+        if (products.containsKey(product)) {
+            int currentQuantity = products.get(product);
+            int newQuantity = currentQuantity + 1;
+            products.put(product, newQuantity);
+        }
+        else {
+            products.put(product, 1);
+        }
+    }
+
+    public void setName(String Nname) {
+        name = Nname;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setMoney(double Mmoney) {
+        money = Mmoney;
+    }
+
+    public double getMoney() {
+        return money;
+    }
+
+    public void setProducts(Map<Product, Integer> prod) {
+        products = prod;
+    }
+
+    public Map<Product, Integer> getProducts(){
+        return products;
+    }
+    public Product getProductByIndex(int index) {
+        List<Product> productList = printAndGetAllProductsWithCount();
+        if(index >= 0 && index < productList.size())
+            return productList.get(index);
+        return null;
+    }
+
+
+    public Shop(String name, double money){
+        this.name = name;
+        this.money = money;
+        this.products = new HashMap<>();
+    }
 
 
     public void sellProduct(Product product, Human human) throws SellProductException {
-        // На вход принимает имя покупаемого продукта
-        // и человека, который хочет приобрести этот продукт
 
-        // Метод должен проверять наличие продукта
-        // В случае если товар закончился, должно выбрасываться исключение
-        // SellProductException с текстом -
-        // "Продукта с именем {product_name} нет в наличии"
+        if(products.get(product) == null || products.get(product) == 0)
+            throw new SellProductException("Продукта с именем " + product.getProduct() + " нет в наличии");
 
-        // Метод должен проверять - достаточно ли средств у покупателя
-        // В случае если средств недостаточно, должно выбрасываться исключение
-        // SellProductException с текстом -
-        // "Уважаемый {first_name lastName}, для покупки товара недостаточно средств
+        if(human.getMoney() < product.getPrice())
+            throw new SellProductException("Уважаемый " + human.getFname() + " " + human.getLname() + ", для покупки товара недостаточно средств");
 
-        // В случае успешной покупки, должен вычисляться НДС и уменьшаться количество
-        // продукта, а так же пополняться денежный счет с учетом НДС, после чего выводит на экран
-        // "{first_name} + ", вы успешно совершили покупку! С уважением, " + {shop_name}
+        double tax = product.getPrice() * 0.2;
+        products.put(product, products.get(product) - 1);
+        money += product.getPrice() + tax;
+        System.out.println("Уважаемый " + human.getFname() + ", вы успешно совершили покупку! С уважением, " + getName());
     }
 
 
     private double calculateNds(double price) {
-        // Метод принимает на вход изначальную цену продукта
-        // Должен возвращать 13 % от стоимости продукта
+        double nds = price * 0.13;
+        return nds;
+
     }
 
 
     public List<Product> printAndGetAllProductsWithCount() {
-        // Должен выводить в консоль все имеющиеся товары и их количество
-        // в порядке возрастания по их цене
-        // Формат вывода: 1. Пылесос - 2 - 12000.00
-        // Должен отдавать список товаров - необходимо для ConsoleService
+        List<Product> productList = new ArrayList<>();
+        int productNumber = 1;
+        for (Map.Entry<Product, Integer> entry : products.entrySet()) {
+            Product product = entry.getKey();
+            productList.add(product);
+            Integer quantity = entry.getValue();
+            if(quantity == 0) System.out.println("Продукт отсутствует");
+            System.out.println(productNumber++ + "." +product + " -" +  quantity);
+        }
+        return productList;
+
+
     }
 
 }
+
+
+
+
 
